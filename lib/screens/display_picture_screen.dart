@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:pikitia/locator.dart';
+import 'package:pikitia/services/piki_service.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   const DisplayPictureScreen({Key? key, required this.imagePath}) : super(key: key);
@@ -33,7 +35,8 @@ class DisplayPictureScreen extends StatelessWidget {
                   color: Colors.white,
                   iconSize: 36.0,
                   icon: const Icon(Icons.check_circle_outline_rounded),
-                  onPressed: () {},
+                  onPressed: () =>
+                      locator<PikiService>().createPiki(imagePath).then((_) => Navigator.of(context).pop()),
                 ),
               ],
             ),

@@ -5,12 +5,11 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:pikitia/services/position_service.dart';
+import '../locator.dart';
 
 /// The radius in km in which the Pikis will be displayed
 const double circleRadius = 5 * 1000;
-
-/// The minimum distance in meters a device has to travel to update the location
-const int distanceFilter = 5;
 
 class PhotosMap extends StatefulWidget {
   const PhotosMap({Key? key}) : super(key: key);
@@ -23,16 +22,12 @@ class _PhotosMapState extends State<PhotosMap> {
   late CenterOnLocationUpdate _centerOnLocationUpdate;
   late StreamController<double> _centerCurrentLocationStreamController;
   late Stream<Position> _positionStream;
-
   @override
   void initState() {
     super.initState();
     _centerOnLocationUpdate = CenterOnLocationUpdate.always;
     _centerCurrentLocationStreamController = StreamController<double>();
-    _positionStream = Geolocator.getPositionStream(
-      desiredAccuracy: LocationAccuracy.bestForNavigation,
-      distanceFilter: distanceFilter
-    ).distinct();
+    _positionStream = locator<PositionService>().watchCurrentPosition();
   }
 
   @override

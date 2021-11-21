@@ -1,4 +1,4 @@
-package com.example.pikitia
+package com.aselo.pikitia
 
 import io.flutter.embedding.android.FlutterActivity
 

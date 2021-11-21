@@ -15,7 +15,6 @@ class Home extends StatelessWidget {
         backgroundColor: Colors.white,
         child: const Icon(Icons.camera_alt, size: 36.0, color: Colors.black,),
         onPressed: () async {
-          WidgetsFlutterBinding.ensureInitialized();
           final cameras = await availableCameras();
           final firstCamera = cameras.first;
           Navigator.push(
