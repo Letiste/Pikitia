@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:pikitia/screens/home_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Pikitia());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class Pikitia extends StatelessWidget {
+  const Pikitia({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

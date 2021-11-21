@@ -107,13 +107,15 @@ class _PhotosMapState extends State<PhotosMap> {
           right: 20,
           bottom: 80,
           child: FloatingActionButton(
+            backgroundColor: Colors.white,
             onPressed: () {
               setState(() => _centerOnLocationUpdate = CenterOnLocationUpdate.always);
               _centerCurrentLocationStreamController.add(15);
             },
             child: const Icon(
               Icons.my_location,
-              color: Colors.white,
+              color: Colors.black,
+              size: 36,
             ),
           ),
         ),

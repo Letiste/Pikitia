@@ -1,4 +1,6 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:pikitia/screens/camera_screen.dart';
 import 'package:pikitia/widgets/photos_map.dart';
 
 class Home extends StatelessWidget {
@@ -9,8 +11,20 @@ class Home extends StatelessWidget {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.camera, size: 36.0),
-        onPressed: () {},
+        heroTag: "photo",
+        backgroundColor: Colors.white,
+        child: const Icon(Icons.camera_alt, size: 36.0, color: Colors.black,),
+        onPressed: () async {
+          WidgetsFlutterBinding.ensureInitialized();
+          final cameras = await availableCameras();
+          final firstCamera = cameras.first;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CameraScreen(camera: firstCamera),
+            ),
+          );
+        },
       ),
       extendBody: true,
       bottomNavigationBar: ClipRRect(
