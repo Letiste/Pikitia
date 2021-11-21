@@ -36,6 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_map: ^0.14.0
   flutter_map_location_marker: ^1.0.0
+  camera: ^0.9.4+5
+  path_provider: ^2.0.7
+  path: ^1.8.0
 
 dev_dependencies:
   flutter_test:
