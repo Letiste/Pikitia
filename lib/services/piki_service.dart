@@ -4,21 +4,51 @@ import 'package:cloud_firestore/cloud_firestore.dart' as firebase_firestore;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:geolocator/geolocator.dart';
 import 'package:pikitia/locator.dart';
+import 'package:pikitia/models/piki.dart';
 import 'package:pikitia/services/position_service.dart';
 import 'package:uuid/uuid.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
 
 class PikiService {
   PikiService() {
     _storage = firebase_storage.FirebaseStorage.instance;
+    _firestore = firebase_firestore.FirebaseFirestore.instance;
+    _geo = Geoflutterfire();
   }
+
   late firebase_storage.FirebaseStorage _storage;
+  late firebase_firestore.FirebaseFirestore _firestore;
+  late Geoflutterfire _geo;
 
   Future<void> createPiki(String filePath) async {
     String htmlUrl = await _uploadFile(filePath);
-    Position position = await locator<PositionService>().getCurrentPosition();
+    Position currentPosition = await locator<PositionService>().getCurrentPosition();
+    GeoFirePoint position = _geo.point(latitude: currentPosition.latitude, longitude: currentPosition.longitude);
     firebase_firestore.FirebaseFirestore.instance.collection('pikis').add(<String, dynamic>{
       'htmlUrl': htmlUrl,
-      'position': firebase_firestore.GeoPoint(position.latitude, position.longitude),
+      'position': position.data,
+    });
+  }
+
+  Stream<List<Piki>> watchPikis(Position position) {
+    firebase_firestore.CollectionReference collectionReference = _firestore.collection('pikis');
+    GeoFirePoint center = _geo.point(latitude: position.latitude, longitude: position.longitude);
+    return _geo
+        .collection(collectionRef: collectionReference)
+        .within(center: center, radius: 5, field: 'position')
+        .distinct()
+        .map((docs) {
+      return docs.map((doc) {
+        var htmlUrl = doc.data()!["htmlUrl"];
+        var position = doc.data()!["position"]["geopoint"];
+        return Piki(
+          htmlUrl: htmlUrl,
+          position: _geo.point(
+            latitude: position.latitude,
+            longitude: position.longitude,
+          ),
+        );
+      }).toList();
     });
   }
 
