@@ -46,6 +46,8 @@ dependencies:
   firebase_storage: ^10.1.0
   uuid: ^3.0.5
   geoflutterfire: ^3.0.1
+  firebase_auth: ^3.2.0
+  flutter_form_builder: ^7.0.0
 
 dev_dependencies:
   flutter_test:

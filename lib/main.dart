@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pikitia/locator.dart';
 import 'package:pikitia/router.dart';
 import 'package:pikitia/screens/home_screen.dart';
+import 'package:pikitia/screens/login_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
