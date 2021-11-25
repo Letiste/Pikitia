@@ -5,7 +5,10 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:pikitia/models/piki.dart';
+import 'package:pikitia/services/piki_service.dart';
 import 'package:pikitia/services/position_service.dart';
+import 'package:pikitia/widgets/piki_preview.dart';
 import '../locator.dart';
 
 /// The radius in km in which the Pikis will be displayed
@@ -77,19 +80,46 @@ class _PhotosMapState extends State<PhotosMap> {
               stream: _positionStream,
               builder: (context, snapshot) {
                 if (snapshot.data != null) {
-                  return CircleLayerWidget(
-                    options: CircleLayerOptions(
-                      circles: [
-                        CircleMarker(
-                          point: LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
-                          radius: circleRadius,
-                          color: Colors.transparent,
-                          borderColor: Colors.red,
-                          borderStrokeWidth: 2,
-                          useRadiusInMeter: true,
-                        )
-                      ],
-                    ),
+                  var pikisStream = locator<PikiService>().watchPikis(snapshot.data!);
+                  return Stack(
+                    children: [
+                      CircleLayerWidget(
+                        options: CircleLayerOptions(
+                          circles: [
+                            CircleMarker(
+                              point: LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
+                              radius: circleRadius,
+                              color: Colors.transparent,
+                              borderColor: Colors.red,
+                              borderStrokeWidth: 2,
+                              useRadiusInMeter: true,
+                            )
+                          ],
+                        ),
+                      ),
+                      StreamBuilder<List<Piki>>(
+                        stream: pikisStream,
+                        builder: (context, snapshot) {
+                          if (snapshot.data != null) {
+                            return MarkerLayerWidget(
+                              options: MarkerLayerOptions(
+                                markers: snapshot.data!.map((piki) {
+                                  return Marker(
+                                      point: LatLng(piki.position.latitude, piki.position.longitude),
+                                      height: 36,
+                                      width: 64,
+                                      builder: (context) {
+                                        return PikiPreview(htmlUrl: piki.htmlUrl);
+                                      });
+                                }).toList(),
+                              ),
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      )
+                    ],
                   );
                 } else {
                   return Container();
