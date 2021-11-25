@@ -5,13 +5,13 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:pikitia/models/piki.dart';
-import 'package:pikitia/services/piki_service.dart';
+import 'package:pikitia/models/pikit.dart';
+import 'package:pikitia/services/pikit_service.dart';
 import 'package:pikitia/services/position_service.dart';
-import 'package:pikitia/widgets/piki_preview.dart';
+import 'package:pikitia/widgets/pikit_preview.dart';
 import '../locator.dart';
 
-/// The radius in km in which the Pikis will be displayed
+/// The radius in km in which the Pikits will be displayed
 const double circleRadius = 5 * 1000;
 
 class PhotosMap extends StatefulWidget {
@@ -80,7 +80,7 @@ class _PhotosMapState extends State<PhotosMap> {
               stream: _positionStream,
               builder: (context, snapshot) {
                 if (snapshot.data != null) {
-                  var pikisStream = locator<PikiService>().watchPikis(snapshot.data!);
+                  var pikitsStream = locator<PikitService>().watchPikits(snapshot.data!);
                   return Stack(
                     children: [
                       CircleLayerWidget(
@@ -97,19 +97,19 @@ class _PhotosMapState extends State<PhotosMap> {
                           ],
                         ),
                       ),
-                      StreamBuilder<List<Piki>>(
-                        stream: pikisStream,
+                      StreamBuilder<List<Pikit>>(
+                        stream: pikitsStream,
                         builder: (context, snapshot) {
                           if (snapshot.data != null) {
                             return MarkerLayerWidget(
                               options: MarkerLayerOptions(
-                                markers: snapshot.data!.map((piki) {
+                                markers: snapshot.data!.map((pikit) {
                                   return Marker(
-                                      point: LatLng(piki.position.latitude, piki.position.longitude),
+                                      point: LatLng(pikit.position.latitude, pikit.position.longitude),
                                       height: 36,
                                       width: 64,
                                       builder: (context) {
-                                        return PikiPreview(htmlUrl: piki.htmlUrl);
+                                        return PikitPreview(htmlUrl: pikit.htmlUrl);
                                       });
                                 }).toList(),
                               ),

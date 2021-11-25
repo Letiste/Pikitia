@@ -4,13 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart' as firebase_firestore;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:geolocator/geolocator.dart';
 import 'package:pikitia/locator.dart';
-import 'package:pikitia/models/piki.dart';
+import 'package:pikitia/models/pikit.dart';
 import 'package:pikitia/services/position_service.dart';
 import 'package:uuid/uuid.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 
-class PikiService {
-  PikiService() {
+class PikitService {
+  PikitService() {
     _storage = firebase_storage.FirebaseStorage.instance;
     _firestore = firebase_firestore.FirebaseFirestore.instance;
     _geo = Geoflutterfire();
@@ -20,18 +20,18 @@ class PikiService {
   late firebase_firestore.FirebaseFirestore _firestore;
   late Geoflutterfire _geo;
 
-  Future<void> createPiki(String filePath) async {
+  Future<void> createPikit(String filePath) async {
     String htmlUrl = await _uploadFile(filePath);
     Position currentPosition = await locator<PositionService>().getCurrentPosition();
     GeoFirePoint position = _geo.point(latitude: currentPosition.latitude, longitude: currentPosition.longitude);
-    firebase_firestore.FirebaseFirestore.instance.collection('pikis').add(<String, dynamic>{
+    firebase_firestore.FirebaseFirestore.instance.collection('pikits').add(<String, dynamic>{
       'htmlUrl': htmlUrl,
       'position': position.data,
     });
   }
 
-  Stream<List<Piki>> watchPikis(Position position) {
-    firebase_firestore.CollectionReference collectionReference = _firestore.collection('pikis');
+  Stream<List<Pikit>> watchPikits(Position position) {
+    firebase_firestore.CollectionReference collectionReference = _firestore.collection('pikits');
     GeoFirePoint center = _geo.point(latitude: position.latitude, longitude: position.longitude);
     return _geo
         .collection(collectionRef: collectionReference)
@@ -41,7 +41,7 @@ class PikiService {
       return docs.map((doc) {
         var htmlUrl = doc.data()!["htmlUrl"];
         var position = doc.data()!["position"]["geopoint"];
-        return Piki(
+        return Pikit(
           htmlUrl: htmlUrl,
           position: _geo.point(
             latitude: position.latitude,
@@ -56,7 +56,7 @@ class PikiService {
     File file = File(filePath);
     String fileName = const Uuid().v4();
     try {
-      firebase_storage.TaskSnapshot uploadedFile = await _storage.ref('pikis/$fileName.jpeg').putFile(file);
+      firebase_storage.TaskSnapshot uploadedFile = await _storage.ref('pikits/$fileName.jpeg').putFile(file);
       String htmlUrl = await _storage.ref(uploadedFile.ref.fullPath.toString()).getDownloadURL();
       return htmlUrl;
     } catch (e) {

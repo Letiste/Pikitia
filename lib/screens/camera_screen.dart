@@ -47,7 +47,7 @@ class _CameraScreenState extends State<CameraScreen> {
             );
           } catch (e) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Error taking a Piki :('),
+              content: Text('Error taking a Pikit :('),
               backgroundColor: Colors.red,
             ));
           }
