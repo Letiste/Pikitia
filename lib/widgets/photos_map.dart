@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:pikitia/models/piki.dart';
 import 'package:pikitia/services/piki_service.dart';
 import 'package:pikitia/services/position_service.dart';
+import 'package:pikitia/widgets/piki_preview.dart';
 import '../locator.dart';
 
 /// The radius in km in which the Pikis will be displayed
@@ -100,17 +101,16 @@ class _PhotosMapState extends State<PhotosMap> {
                         stream: pikisStream,
                         builder: (context, snapshot) {
                           if (snapshot.data != null) {
-                            return CircleLayerWidget(
-                              options: CircleLayerOptions(
-                                circles: snapshot.data!.map((piki) {
-                                  return CircleMarker(
-                                    point: LatLng(piki.position.latitude, piki.position.longitude),
-                                    radius: 10,
-                                    color: Colors.transparent,
-                                    borderColor: Colors.red,
-                                    borderStrokeWidth: 2,
-                                    useRadiusInMeter: true,
-                                  );
+                            return MarkerLayerWidget(
+                              options: MarkerLayerOptions(
+                                markers: snapshot.data!.map((piki) {
+                                  return Marker(
+                                      point: LatLng(piki.position.latitude, piki.position.longitude),
+                                      height: 36,
+                                      width: 64,
+                                      builder: (context) {
+                                        return PikiPreview(htmlUrl: piki.htmlUrl);
+                                      });
                                 }).toList(),
                               ),
                             );
