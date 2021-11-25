@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class PikiPreview extends StatelessWidget {
-  const PikiPreview({required this.htmlUrl, Key? key}) : super(key: key);
+class PikitPreview extends StatelessWidget {
+  const PikitPreview({required this.htmlUrl, Key? key}) : super(key: key);
 
   final String htmlUrl;
   @override
