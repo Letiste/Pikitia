@@ -36,7 +36,7 @@ class DisplayPictureScreen extends StatelessWidget {
                   iconSize: 36.0,
                   icon: const Icon(Icons.check_circle_outline_rounded),
                   onPressed: () =>
-                      locator<PikitService>().createPiki(imagePath).then((_) => Navigator.of(context).pop()),
+                      locator<PikitService>().createPikit(imagePath).then((_) => Navigator.of(context).pop()),
                 ),
               ],
             ),
