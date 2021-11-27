@@ -5,16 +5,16 @@ import 'package:pikitia/services/routes_service.dart';
 import 'package:pikitia/services/user_service.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
-class LoginScreen extends StatefulWidget {
-  LoginScreen({Key? key}) : super(key: key);
+class RegisterScreen extends StatefulWidget {
+  RegisterScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
-  String _generalError = "";
+  bool _hasError = false;
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +24,9 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (_generalError.isNotEmpty)
-              Text(
-                _generalError,
+            if (_hasError)
+              const Text(
+                'Sorry, an error occured while creating your account.',
                 style: TextStyle(color: Colors.red),
               ),
             FormBuilder(
@@ -56,8 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             TextButton(
-              onPressed: () => locator<RoutesService>().goToRegister(),
-              child: const Text('Not an account yet?'),
+              onPressed: () => locator<RoutesService>().goToLogin(),
+              child: const Text('Already have an account?'),
             ),
             const SizedBox(height: 16),
             Row(
@@ -65,8 +65,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 Expanded(
                   child: MaterialButton(
                     color: Theme.of(context).colorScheme.secondary,
-                    child: Text("Login"),
-                    onPressed: _handleLogin,
+                    child: Text("Register"),
+                    onPressed: _handleRegister,
                   ),
                 )
               ],
@@ -77,29 +77,29 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleRegister() async {
     _formKey.currentState!.save();
-    var newGeneralError = "";
+    var newHasError = true;
     if (_formKey.currentState!.validate()) {
       var email = _formKey.currentState!.value["email"];
       var password = _formKey.currentState!.value["password"];
-      var error = await locator<UserService>().loginUser(email, password);
+      var error = await locator<UserService>().registerUser(email, password);
       if (error != null) {
         switch (error) {
-          case LoginError.invalidCredentials:
-            newGeneralError = "Invalid credentials.";
+          case RegistrationError.emailAlreadyInUse:
+            _formKey.currentState?.invalidateField(name: 'email', errorText: 'Email already taken.');
             break;
-          case LoginError.invalidEmail:
+          case RegistrationError.invalidEmail:
             _formKey.currentState?.invalidateField(name: 'email', errorText: 'Invalid email.');
             break;
-          case LoginError.userDisabled:
-            newGeneralError = "Account disabled.";
+          case RegistrationError.weakPassword:
+            _formKey.currentState?.invalidateField(name: 'password', errorText: 'Password too weak.');
             break;
           default:
-            newGeneralError = "Sorry, an error occured while logging you in.";
+            newHasError = false;
         }
       }
-      setState(() => _generalError = newGeneralError);
+      setState(() => _hasError = newHasError);
     }
   }
 }

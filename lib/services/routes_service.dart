@@ -1,6 +1,6 @@
 import 'dart:async';
 
-enum Routes { home, camera }
+enum Routes { home, camera, register, login }
 
 class RoutesService {
   RoutesService() {
@@ -22,5 +22,13 @@ class RoutesService {
 
   void goToCamera() {
     _routesStreamController.sink.add(Routes.camera);
+  }
+
+  void goToRegister() {
+    _routesStreamController.sink.add(Routes.register);
+  }
+
+  void goToLogin() {
+    _routesStreamController.sink.add(Routes.login);
   }
 }
