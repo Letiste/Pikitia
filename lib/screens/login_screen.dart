@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-
-import 'home_screen.dart';
+import 'package:pikitia/locator.dart';
+import 'package:pikitia/services/user_service.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -12,6 +13,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
+  bool _hasError = false;
 
   @override
   Widget build(BuildContext context) {
@@ -21,22 +23,30 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            if (_hasError) const Text('Sorry, an error occured while creating your account.'),
             FormBuilder(
               key: _formKey,
-              autovalidateMode: AutovalidateMode.always,
+              autovalidateMode: AutovalidateMode.disabled,
               child: Column(
                 children: [
                   FormBuilderTextField(
                     name: 'email',
                     decoration: InputDecoration(labelText: 'Email'),
                     keyboardType: TextInputType.emailAddress,
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(context),
+                      FormBuilderValidators.email(context),
+                    ]),
                   ),
                   FormBuilderTextField(
-                    name: 'password',
-                    decoration: InputDecoration(labelText: 'Password'),
-                    keyboardType: TextInputType.text,
-                    obscureText: true,
-                  ),
+                      name: 'password',
+                      decoration: InputDecoration(labelText: 'Password'),
+                      keyboardType: TextInputType.text,
+                      obscureText: true,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(context),
+                        FormBuilderValidators.minLength(context, 6),
+                      ])),
                 ],
               ),
             ),
@@ -45,16 +55,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 Expanded(
                   child: MaterialButton(
                     color: Theme.of(context).colorScheme.secondary,
-                    child: Text("Submit"),
-                    onPressed: () {
-                      _formKey.currentState!.save();
-                      if (_formKey.currentState!.validate()) {
-                        print(_formKey.currentState!.value);
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => Home()));
-                      } else {
-                        print("validation failed");
-                      }
-                    },
+                    child: Text("Register"),
+                    onPressed: _handleRegister,
                   ),
                 )
               ],
@@ -63,5 +65,31 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleRegister() async {
+    _formKey.currentState!.save();
+    var newHasError = true;
+    if (_formKey.currentState!.validate()) {
+      var email = _formKey.currentState!.value["email"];
+      var password = _formKey.currentState!.value["password"];
+      var error = await locator<UserService>().registerUser(email, password);
+      if (error != null) {
+        switch (error) {
+          case RegistrationError.emailAlreadyInUse:
+            _formKey.currentState?.invalidateField(name: 'email', errorText: 'Email already taken.');
+            break;
+          case RegistrationError.invalidEmail:
+            _formKey.currentState?.invalidateField(name: 'email', errorText: 'Invalid email.');
+            break;
+          case RegistrationError.weakPassword:
+            _formKey.currentState?.invalidateField(name: 'password', errorText: 'Password too weak.');
+            break;
+          default:
+            newHasError = false;
+        }
+      }
+      setState(() => _hasError = newHasError);
+    }
   }
 }
