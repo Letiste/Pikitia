@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pikitia/locator.dart';
 import 'package:pikitia/services/pikit_service.dart';
+import 'package:pikitia/services/routes_service.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   const DisplayPictureScreen({Key? key, required this.imagePath}) : super(key: key);
@@ -36,7 +37,7 @@ class DisplayPictureScreen extends StatelessWidget {
                   iconSize: 36.0,
                   icon: const Icon(Icons.check_circle_outline_rounded),
                   onPressed: () =>
-                      locator<PikitService>().createPikit(imagePath).then((_) => Navigator.of(context).pop()),
+                      locator<PikitService>().createPikit(imagePath).then((_) => locator<RoutesService>().goToHome())
                 ),
               ],
             ),

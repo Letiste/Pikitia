@@ -1,10 +1,10 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:pikitia/screens/camera_screen.dart';
+import 'package:pikitia/locator.dart';
+import 'package:pikitia/services/routes_service.dart';
 import 'package:pikitia/widgets/photos_map.dart';
 
-class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,16 +14,7 @@ class Home extends StatelessWidget {
         heroTag: "photo",
         backgroundColor: Colors.white,
         child: const Icon(Icons.camera_alt, size: 36.0, color: Colors.black,),
-        onPressed: () async {
-          final cameras = await availableCameras();
-          final firstCamera = cameras.first;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CameraScreen(camera: firstCamera),
-            ),
-          );
-        },
+        onPressed: () => locator<RoutesService>().goToCamera()
       ),
       extendBody: true,
       bottomNavigationBar: ClipRRect(
