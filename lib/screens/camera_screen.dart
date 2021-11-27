@@ -18,7 +18,7 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
-    _cameraController = CameraController(widget.camera, ResolutionPreset.veryHigh);
+    _cameraController = CameraController(widget.camera, ResolutionPreset.veryHigh, enableAudio: false);
     _initializeControllerFuture = _cameraController.initialize();
   }
 
