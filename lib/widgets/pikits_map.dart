@@ -104,10 +104,12 @@ class _PhotosMapState extends State<PhotosMap> {
                             return MarkerLayerWidget(
                               options: MarkerLayerOptions(
                                 markers: snapshot.data!.map((pikit) {
+                                  double height = pikit.pikitImage.isLandscape ? 36 : 64;
+                                  double width = pikit.pikitImage.isLandscape ? 64 : 36;
                                   return Marker(
                                       point: LatLng(pikit.position.latitude, pikit.position.longitude),
-                                      height: 36,
-                                      width: 64,
+                                      height: height,
+                                      width: width,
                                       builder: (context) {
                                         return PikitPreview(pikitImage: pikit.pikitImage);
                                       });

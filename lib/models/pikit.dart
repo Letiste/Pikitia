@@ -8,8 +8,9 @@ class Pikit {
 }
 
 class PikitImage {
-  PikitImage({required this.htmlUrl, required this.htmlUrlPreview});
+  PikitImage({required this.htmlUrl, required this.htmlUrlPreview, required this.isLandscape});
 
   final String htmlUrl;
   final String htmlUrlPreview;
+  final bool isLandscape;
 }
