@@ -2,7 +2,7 @@
     xmlns:tools="https://schemas.android.com/tools"
     package="com.aselo.pikitia">
    <application
-        android:label="¨Pikitia"
+        android:label="Pikitia"
         android:icon="@mipmap/launcer_icon">
         <activity
             android:name=".MainActivity"
