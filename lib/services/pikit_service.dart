@@ -52,6 +52,19 @@ class PikitService {
         .toList();
   }
 
+  Future<List<Pikit>> getPikitsLikedByUser() async {
+    String currentUserId = locator<UserService>().getCurrentUser()!.uid;
+    var queryIdPikits = await _pikitsLikedCollection.where('userId', isEqualTo: currentUserId).get()
+        as firebase_firestore.QuerySnapshot<Map<String, dynamic>>;
+    if (queryIdPikits.docs.isEmpty) {
+      return [];
+    }
+    var idPikits = queryIdPikits.docs.map((doc) => doc.data()["pikitId"]).toList();
+    var queryPikits = await _pikitsCollection.where(firebase_firestore.FieldPath.documentId, whereIn: idPikits).get()
+        as firebase_firestore.QuerySnapshot<Map<String, dynamic>>;
+    return queryPikits.docs.map(Pikit.fromDocument).toList();
+  }
+
   Future<void> likePikit(Pikit pikit) async {
     if (!(await isPikitLikedByUser(pikit))) {
       await _pikitsLikedCollection.add({

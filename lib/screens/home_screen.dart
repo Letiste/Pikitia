@@ -40,7 +40,7 @@ class HomeScreen extends StatelessWidget {
                   Icons.favorite,
                   color: Colors.red,
                 ),
-                onPressed: () {},
+                onPressed: () => _routesService.goToUserLikedPikits(),
               ),
               IconButton(
                 iconSize: 36.0,
