@@ -6,6 +6,6 @@ class HomePage extends Page {
 
   @override
   Route createRoute(BuildContext context) {
-    return MaterialPageRoute(settings: this, builder: (context) => const HomeScreen());
+    return MaterialPageRoute(settings: this, builder: (context) => HomeScreen());
   }
 }
