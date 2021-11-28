@@ -29,6 +29,7 @@ class PikitService {
     firebase_firestore.FirebaseFirestore.instance.collection('pikits').add(<String, dynamic>{
       'htmlUrl': pikitImage.htmlUrl,
       'htmlUrlPreview': pikitImage.htmlUrlPreview,
+      'isLandscape': pikitImage.isLandscape,
       'position': position.data,
     });
   }
@@ -44,11 +45,13 @@ class PikitService {
       return docs.map((doc) {
         var htmlUrl = doc.data()!["htmlUrl"];
         var htmlUrlPreview = doc.data()!["htmlUrlPreview"];
+        var isLandscape = doc.data()!["isLandscape"];
         var position = doc.data()!["position"]["geopoint"];
         return Pikit(
           pikitImage: PikitImage(
             htmlUrl: htmlUrl,
             htmlUrlPreview: htmlUrlPreview,
+            isLandscape: isLandscape,
           ),
           position: _geo.point(
             latitude: position.latitude,
@@ -63,10 +66,11 @@ class PikitService {
     File file = File(filePath);
     img.Image image = img.decodeJpg(file.readAsBytesSync());
     img.Image preview;
-    if (image.height > image.width) {
-      preview = img.copyResize(image, height: 120);
-    } else {
+    bool isLandscape = image.width > image.height;
+    if (isLandscape) {
       preview = img.copyResize(image, width: 120);
+    } else {
+      preview = img.copyResize(image, height: 120);
     }
     String fileName = const Uuid().v4();
     late String htmlUrl;
@@ -82,7 +86,7 @@ class PikitService {
         .then((file) => _getHtmlUrl(file))
         .then((url) => htmlUrlPreview = url);
     await Future.wait([uploadedImage, uploadedImagePreview]);
-    return PikitImage(htmlUrl: htmlUrl, htmlUrlPreview: htmlUrlPreview);
+    return PikitImage(htmlUrl: htmlUrl, htmlUrlPreview: htmlUrlPreview, isLandscape: isLandscape);
   }
 
   Future<String> _getHtmlUrl(firebase_storage.TaskSnapshot snapshot) {
