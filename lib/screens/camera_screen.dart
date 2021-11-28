@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:pikitia/screens/display_picture_screen.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({Key? key, required this.camera}) : super(key: key);
+  const CameraScreen({Key? key, required this.cameras}) : super(key: key);
 
-  final CameraDescription camera;
+  final List<CameraDescription> cameras;
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -14,11 +14,16 @@ class CameraScreen extends StatefulWidget {
 class _CameraScreenState extends State<CameraScreen> {
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
+  int selectedCamera = 0;
 
   @override
   void initState() {
     super.initState();
-    _cameraController = CameraController(widget.camera, ResolutionPreset.veryHigh, enableAudio: false);
+    _initializeCamera(selectedCamera);
+  }
+
+  Future<void> _initializeCamera(int cameraIndex) async {
+    _cameraController = CameraController(widget.cameras[cameraIndex], ResolutionPreset.veryHigh, enableAudio: false);
     _initializeControllerFuture = _cameraController.initialize();
   }
 
@@ -30,41 +35,77 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () async {
-          try {
-            await _initializeControllerFuture;
-            final image = await _cameraController.takePicture();
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  imagePath: image.path,
+    return FutureBuilder<void>(
+      future: _initializeControllerFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Stack(
+            children: [
+              SizedBox.expand(child: CameraPreview(_cameraController)),
+              Align(
+                alignment: const Alignment(0, 0.9),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisSize: MainAxisSize.max,
+                  children: widget.cameras.length > 1
+                      ? [
+                          const Spacer(),
+                          Expanded(child: cameraButton()),
+                          Expanded(child: flipCamera()),
+                        ]
+                      : [
+                          Expanded(child: cameraButton()),
+                        ],
                 ),
+              )
+            ],
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
+  }
+
+  Widget cameraButton() {
+    return FloatingActionButton(
+      backgroundColor: Colors.white,
+      onPressed: () async {
+        try {
+          await _initializeControllerFuture;
+          final image = await _cameraController.takePicture();
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => DisplayPictureScreen(
+                imagePath: image.path,
               ),
-            );
-          } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text('Error taking a Pikit :('),
-              backgroundColor: Colors.red,
-            ));
-          }
-        },
-        child: const Icon(Icons.camera, size: 36, color: Colors.black),
-      ),
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return SizedBox.expand(child: CameraPreview(_cameraController));
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
+            ),
+          );
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Error taking a Pikit :('),
+            backgroundColor: Colors.red,
+          ));
+        }
+      },
+      child: const Icon(Icons.camera, size: 36, color: Colors.black),
+    );
+  }
+
+  Widget flipCamera() {
+    return FloatingActionButton(
+      backgroundColor: Colors.white,
+      onPressed: () {
+        setState(() {
+          selectedCamera = selectedCamera == 0 ? 1 : 0;
+          _initializeCamera(selectedCamera);
+        });
+      },
+      child: const Icon(
+        Icons.flip_camera_android,
+        color: Colors.black,
       ),
     );
   }
