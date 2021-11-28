@@ -106,12 +106,14 @@ class _PhotosMapState extends State<PhotosMap> {
                                 markers: snapshot.data!.map((pikit) {
                                   double height = pikit.pikitImage.isLandscape ? 36 : 64;
                                   double width = pikit.pikitImage.isLandscape ? 64 : 36;
+                                  double offsetHeight = 8 + 2 + 2; // height of triangle + padding top + padding bottom
+                                  double offsetWidth = 2 + 2; // padding right + padding left
                                   return Marker(
                                       point: LatLng(pikit.position.latitude, pikit.position.longitude),
-                                      height: height,
-                                      width: width,
+                                      height: height + offsetHeight,
+                                      width: width + offsetWidth,
                                       builder: (context) {
-                                        return PikitPreview(pikitImage: pikit.pikitImage);
+                                        return PikitPreview(pikitImage: pikit.pikitImage, height: height, width: width);
                                       });
                                 }).toList(),
                               ),
