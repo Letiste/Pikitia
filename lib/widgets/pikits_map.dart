@@ -113,7 +113,7 @@ class _PhotosMapState extends State<PhotosMap> {
                                       height: height + offsetHeight,
                                       width: width + offsetWidth,
                                       builder: (context) {
-                                        return PikitPreview(pikitImage: pikit.pikitImage, height: height, width: width);
+                                        return PikitPreview(pikit: pikit, height: height, width: width);
                                       });
                                 }).toList(),
                               ),

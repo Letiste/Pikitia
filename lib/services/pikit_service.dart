@@ -17,13 +17,15 @@ class PikitService {
     _storage = firebase_storage.FirebaseStorage.instance;
     _firestore = firebase_firestore.FirebaseFirestore.instance;
     _pikitsCollection = _firestore.collection('pikits');
+    _pikitsLikedCollection = _firestore.collection('pikitsLiked');
     _geo = Geoflutterfire();
   }
 
-  late firebase_storage.FirebaseStorage _storage;
-  late firebase_firestore.FirebaseFirestore _firestore;
-  late firebase_firestore.CollectionReference _pikitsCollection;
-  late Geoflutterfire _geo;
+  late final firebase_storage.FirebaseStorage _storage;
+  late final firebase_firestore.FirebaseFirestore _firestore;
+  late final firebase_firestore.CollectionReference _pikitsCollection;
+  late final firebase_firestore.CollectionReference _pikitsLikedCollection;
+  late final Geoflutterfire _geo;
 
   Future<void> createPikit(String filePath) async {
     late PikitImage pikitImage;
@@ -48,6 +50,35 @@ class PikitService {
     return query.docs
         .map((doc) => Pikit.fromDocument(doc as firebase_firestore.QueryDocumentSnapshot<Map<String, dynamic>>))
         .toList();
+  }
+
+  Future<void> likePikit(Pikit pikit) async {
+    if (!(await isPikitLikedByUser(pikit))) {
+      await _pikitsLikedCollection.add({
+        'userId': locator<UserService>().getCurrentUser()!.uid,
+        'pikitId': pikit.pikitId,
+      });
+    }
+  }
+
+  Future<void> unlikePikit(Pikit pikit) async {
+    await _pikitsLikedCollection
+        .where('userId', isEqualTo: locator<UserService>().getCurrentUser()!.uid)
+        .where('pikitId', isEqualTo: pikit.pikitId)
+        .get()
+        .then((query) {
+      if (query.docs.length == 1) {
+        query.docs.first.reference.delete();
+      }
+    });
+  }
+
+  Future<bool> isPikitLikedByUser(Pikit pikit) async {
+    var doc = await _pikitsLikedCollection
+        .where('userId', isEqualTo: locator<UserService>().getCurrentUser()!.uid)
+        .where('pikitId', isEqualTo: pikit.pikitId)
+        .get();
+    return doc.size == 1;
   }
 
   Stream<List<Pikit>> watchPikits(Position position) {

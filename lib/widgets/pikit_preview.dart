@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pikitia/models/pikit.dart';
+import 'package:pikitia/screens/pikit_screen.dart';
 
 class PikitPreview extends StatelessWidget {
-  const PikitPreview({required this.pikitImage, required this.height, required this.width, Key? key}) : super(key: key);
+  const PikitPreview({required this.pikit, required this.height, required this.width, Key? key}) : super(key: key);
 
-  final PikitImage pikitImage;
+  final Pikit pikit;
   final double height;
   final double width;
 
@@ -13,10 +14,7 @@ class PikitPreview extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => Hero(
-            tag: pikitImage,
-            child: Image.network(pikitImage.htmlUrl),
-          ),
+          builder: (context) => PikitScreen(pikit: pikit),
         ),
       ),
       child: Stack(
@@ -35,9 +33,9 @@ class PikitPreview extends StatelessWidget {
                 color: Colors.white,
                 padding: const EdgeInsets.fromLTRB(1.0, 1.0, 1.0, 1.0),
                 child: Hero(
-                  tag: pikitImage,
+                  tag: pikit,
                   child: Image.network(
-                    pikitImage.htmlUrlPreview,
+                    pikit.pikitImage.htmlUrlPreview,
                     fit: BoxFit.scaleDown,
                     height: height,
                     width: width,
