@@ -42,22 +42,13 @@ class _CameraScreenState extends State<CameraScreen> {
           return Stack(
             children: [
               SizedBox.expand(child: CameraPreview(_cameraController)),
-              Align(
-                alignment: const Alignment(0, 0.9),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  mainAxisSize: MainAxisSize.max,
-                  children: widget.cameras.length > 1
-                      ? [
-                          const Spacer(),
-                          Expanded(child: cameraButton()),
-                          Expanded(child: flipCamera()),
-                        ]
-                      : [
-                          Expanded(child: cameraButton()),
-                        ],
-                ),
-              )
+              OrientationBuilder(builder: (context, orientation) {
+                if (orientation == Orientation.portrait) {
+                  return portraitButtons();
+                } else {
+                  return landscapeButtons();
+                }
+              })
             ],
           );
         } else {
@@ -66,6 +57,44 @@ class _CameraScreenState extends State<CameraScreen> {
           );
         }
       },
+    );
+  }
+
+  Widget portraitButtons() {
+    return Align(
+      alignment: const Alignment(0, 0.9),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisSize: MainAxisSize.max,
+        children: widget.cameras.length > 1
+            ? [
+                const Spacer(),
+                Expanded(child: cameraButton()),
+                Expanded(child: flipCamera()),
+              ]
+            : [
+                Expanded(child: cameraButton()),
+              ],
+      ),
+    );
+  }
+
+  Widget landscapeButtons() {
+    return Align(
+      alignment: const Alignment(0.9, 1),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisSize: MainAxisSize.max,
+        children: widget.cameras.length > 1
+            ? [
+                const Spacer(),
+                Expanded(child: cameraButton()),
+                Expanded(child: flipCamera()),
+              ]
+            : [
+                Expanded(child: cameraButton()),
+              ],
+      ),
     );
   }
 
