@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pikitia/locator.dart';
 import 'package:pikitia/services/routes_service.dart';
-import 'package:pikitia/widgets/photos_map.dart';
+import 'package:pikitia/widgets/pikits_map.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
