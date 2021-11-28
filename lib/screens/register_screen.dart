@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:pikitia/components/button_action.seconday.dart';
+import 'package:pikitia/components/button_action_primary.dart';
 import 'package:pikitia/locator.dart';
 import 'package:pikitia/services/routes_service.dart';
 import 'package:pikitia/services/user_service.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 class RegisterScreen extends StatefulWidget {
-  RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -20,10 +22,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const Text('Create a new account', style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600),),
+            const SizedBox(height: 60),
             if (_hasError)
               const Text(
                 'Sorry, an error occured while creating your account.',
@@ -36,7 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   FormBuilderTextField(
                     name: 'email',
-                    decoration: InputDecoration(labelText: 'Email'),
+                    decoration: const InputDecoration(labelText: 'Email'),
                     keyboardType: TextInputType.emailAddress,
                     validator: FormBuilderValidators.compose([
                       FormBuilderValidators.required(context),
@@ -45,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   FormBuilderTextField(
                       name: 'password',
-                      decoration: InputDecoration(labelText: 'Password'),
+                      decoration: const InputDecoration(labelText: 'Password'),
                       keyboardType: TextInputType.text,
                       obscureText: true,
                       validator: FormBuilderValidators.compose([
@@ -55,20 +59,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ],
               ),
             ),
-            TextButton(
-              onPressed: () => locator<RoutesService>().goToLogin(),
-              child: const Text('Already have an account?'),
+            const SizedBox(height: 8),
+            ButtonActionSecondary(
+              text: 'Already have an account?',
+              handleOnPressed: () => locator<RoutesService>().goToLogin(),
             ),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
-                  child: MaterialButton(
-                    color: Theme.of(context).colorScheme.secondary,
-                    child: Text("Register"),
-                    onPressed: _handleRegister,
-                  ),
-                )
+                    child: ButtonActionPrimary(
+                  text: "Register",
+                  handlePressed: _handleRegister,
+                ))
               ],
             )
           ],
