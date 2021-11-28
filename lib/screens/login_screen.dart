@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:pikitia/components/button_action.seconday.dart';
+import 'package:pikitia/components/button_action_primary.dart';
 import 'package:pikitia/locator.dart';
 import 'package:pikitia/services/routes_service.dart';
 import 'package:pikitia/services/user_service.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 class LoginScreen extends StatefulWidget {
-  LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -20,14 +22,16 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const Text('Log into your account', style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600),),
+            const SizedBox(height: 60),
             if (_generalError.isNotEmpty)
               Text(
                 _generalError,
-                style: TextStyle(color: Colors.red),
+                style: const TextStyle(color: Colors.red),
               ),
             FormBuilder(
               key: _formKey,
@@ -36,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   FormBuilderTextField(
                     name: 'email',
-                    decoration: InputDecoration(labelText: 'Email'),
+                    decoration: const InputDecoration(labelText: 'Email'),
                     keyboardType: TextInputType.emailAddress,
                     validator: FormBuilderValidators.compose([
                       FormBuilderValidators.required(context),
@@ -45,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   FormBuilderTextField(
                       name: 'password',
-                      decoration: InputDecoration(labelText: 'Password'),
+                      decoration: const InputDecoration(labelText: 'Password'),
                       keyboardType: TextInputType.text,
                       obscureText: true,
                       validator: FormBuilderValidators.compose([
@@ -55,20 +59,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-            TextButton(
-              onPressed: () => locator<RoutesService>().goToRegister(),
-              child: const Text('Not an account yet?'),
+            ButtonActionSecondary(
+              text: 'Not an account yet?',
+              handleOnPressed: () => locator<RoutesService>().goToRegister(),
             ),
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(
-                  child: MaterialButton(
-                    color: Theme.of(context).colorScheme.secondary,
-                    child: Text("Login"),
-                    onPressed: _handleLogin,
-                  ),
-                )
+                Expanded(child: ButtonActionPrimary(text: 'Login', handlePressed: _handleLogin)),
               ],
             )
           ],
