@@ -14,7 +14,7 @@ class CameraPage extends Page {
           future: availableCameras(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return CameraScreen(camera: snapshot.data!.first);
+              return CameraScreen(cameras: snapshot.data!);
             } else {
               return CircularProgressIndicator();
             }

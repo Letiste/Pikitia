@@ -79,7 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _handleRegister() async {
     _formKey.currentState!.save();
-    var newHasError = true;
+    var newHasError = false;
     if (_formKey.currentState!.validate()) {
       var email = _formKey.currentState!.value["email"];
       var password = _formKey.currentState!.value["password"];
@@ -96,7 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             _formKey.currentState?.invalidateField(name: 'password', errorText: 'Password too weak.');
             break;
           default:
-            newHasError = false;
+            newHasError = true;
         }
       }
       setState(() => _hasError = newHasError);
