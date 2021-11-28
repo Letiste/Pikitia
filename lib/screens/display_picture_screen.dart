@@ -45,7 +45,7 @@ class DisplayPictureScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: Image.file(File(imagePath), fit: BoxFit.contain),
+      body: Center(child: Image.file(File(imagePath), fit: BoxFit.contain)),
     );
   }
 }
