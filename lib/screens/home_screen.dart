@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:pikitia/locator.dart';
+import 'package:pikitia/services/pikit_service.dart';
 import 'package:pikitia/services/routes_service.dart';
 import 'package:pikitia/widgets/pikits_map.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({Key? key}) : super(key: key) {
+    _routesService = locator<RoutesService>();
+  }
+
+  late final RoutesService _routesService;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +19,7 @@ class HomeScreen extends StatelessWidget {
         heroTag: "photo",
         backgroundColor: Colors.white,
         child: const Icon(Icons.camera_alt, size: 36.0, color: Colors.black,),
-        onPressed: () => locator<RoutesService>().goToCamera()
+        onPressed: () => _routesService.goToCamera()
       ),
       extendBody: true,
       bottomNavigationBar: ClipRRect(
@@ -40,7 +45,7 @@ class HomeScreen extends StatelessWidget {
               IconButton(
                 iconSize: 36.0,
                 icon: const Icon(Icons.photo_size_select_actual_rounded),
-                onPressed: () {},
+                onPressed: () => _routesService.goToUserPikits(),
               ),
             ],
           ),

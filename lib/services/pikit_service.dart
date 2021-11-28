@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:pikitia/locator.dart';
 import 'package:pikitia/models/pikit.dart';
 import 'package:pikitia/services/position_service.dart';
+import 'package:pikitia/services/user_service.dart';
 import 'package:uuid/uuid.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:image/image.dart' as img;
@@ -15,50 +16,48 @@ class PikitService {
   PikitService() {
     _storage = firebase_storage.FirebaseStorage.instance;
     _firestore = firebase_firestore.FirebaseFirestore.instance;
+    _pikitsCollection = _firestore.collection('pikits');
     _geo = Geoflutterfire();
   }
 
   late firebase_storage.FirebaseStorage _storage;
   late firebase_firestore.FirebaseFirestore _firestore;
+  late firebase_firestore.CollectionReference _pikitsCollection;
   late Geoflutterfire _geo;
 
   Future<void> createPikit(String filePath) async {
-    PikitImage pikitImage = await _uploadFile(filePath);
-    Position currentPosition = await locator<PositionService>().getCurrentPosition();
+    late PikitImage pikitImage;
+    late Position currentPosition;
+    Future<void> pikitImageFuture = _uploadFile(filePath).then((pikitImg) => pikitImage = pikitImg);
+    Future<void> currentPositionFuture =
+        locator<PositionService>().getCurrentPosition().then((pos) => currentPosition = pos);
+    await Future.wait([pikitImageFuture, currentPositionFuture]);
     GeoFirePoint position = _geo.point(latitude: currentPosition.latitude, longitude: currentPosition.longitude);
-    firebase_firestore.FirebaseFirestore.instance.collection('pikits').add(<String, dynamic>{
+    _pikitsCollection.add(<String, dynamic>{
       'htmlUrl': pikitImage.htmlUrl,
       'htmlUrlPreview': pikitImage.htmlUrlPreview,
       'isLandscape': pikitImage.isLandscape,
       'position': position.data,
+      'userId': locator<UserService>().getCurrentUser()!.uid,
     });
   }
 
+  Future<List<Pikit>> getUserPikits() async {
+    String currentUserId = locator<UserService>().getCurrentUser()!.uid;
+    var query = await _pikitsCollection.where('userId', isEqualTo: currentUserId).get();
+    return query.docs
+        .map((doc) => Pikit.fromDocument(doc as firebase_firestore.QueryDocumentSnapshot<Map<String, dynamic>>))
+        .toList();
+  }
+
   Stream<List<Pikit>> watchPikits(Position position) {
-    firebase_firestore.CollectionReference collectionReference = _firestore.collection('pikits');
     GeoFirePoint center = _geo.point(latitude: position.latitude, longitude: position.longitude);
     return _geo
-        .collection(collectionRef: collectionReference)
+        .collection(collectionRef: _pikitsCollection)
         .within(center: center, radius: 5, field: 'position')
         .distinct()
         .map((docs) {
-      return docs.map((doc) {
-        var htmlUrl = doc.data()!["htmlUrl"];
-        var htmlUrlPreview = doc.data()!["htmlUrlPreview"];
-        var isLandscape = doc.data()!["isLandscape"];
-        var position = doc.data()!["position"]["geopoint"];
-        return Pikit(
-          pikitImage: PikitImage(
-            htmlUrl: htmlUrl,
-            htmlUrlPreview: htmlUrlPreview,
-            isLandscape: isLandscape,
-          ),
-          position: _geo.point(
-            latitude: position.latitude,
-            longitude: position.longitude,
-          ),
-        );
-      }).toList();
+      return docs.map(Pikit.fromDocument).toList();
     });
   }
 

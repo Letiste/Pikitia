@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 enum RegistrationError { emailAlreadyInUse, invalidEmail, weakPassword, genericError }
-enum LoginError {invalidEmail, userDisabled, invalidCredentials, genericError}
+enum LoginError { invalidEmail, userDisabled, invalidCredentials, genericError }
 
 class UserService {
   UserService() {
@@ -9,6 +9,10 @@ class UserService {
   }
 
   late firebase_auth.FirebaseAuth _auth;
+
+  firebase_auth.User? getCurrentUser() {
+    return _auth.currentUser;
+  }
 
   Stream<firebase_auth.User?> watchUser() {
     return _auth.authStateChanges();

@@ -25,6 +25,7 @@ class PikitiaRouterDelegate extends RouterDelegate with ChangeNotifier, PopNavig
   bool handlePopPage(Route route, result) {
     if (!route.didPop(result)) return false;
     if (_currentRoute == Routes.camera) _routesService.goToHome();
+    if (_currentRoute == Routes.userPikits) _routesService.goToHome();
     return true;
   }
 
