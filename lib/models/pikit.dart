@@ -8,7 +8,7 @@ class Pikit {
   final GeoFirePoint position;
   final String pikitId;
 
-  static Pikit fromDocument(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory Pikit.fromDocument(DocumentSnapshot<Map<String, dynamic>> doc) {
     var htmlUrl = doc.data()!["htmlUrl"];
     var htmlUrlPreview = doc.data()!["htmlUrlPreview"];
     var isLandscape = doc.data()!["isLandscape"];
