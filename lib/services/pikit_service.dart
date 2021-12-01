@@ -62,7 +62,7 @@ class PikitService {
     var idPikits = queryIdPikits.docs.map((doc) => doc.data()["pikitId"]).toList();
     var queryPikits = await _pikitsCollection.where(firebase_firestore.FieldPath.documentId, whereIn: idPikits).get()
         as firebase_firestore.QuerySnapshot<Map<String, dynamic>>;
-    return queryPikits.docs.map(Pikit.fromDocument).toList();
+    return queryPikits.docs.map((doc) => Pikit.fromDocument(doc)).toList();
   }
 
   Future<void> likePikit(Pikit pikit) async {
@@ -101,7 +101,7 @@ class PikitService {
         .within(center: center, radius: 5, field: 'position')
         .distinct()
         .map((docs) {
-      return docs.map(Pikit.fromDocument).toList();
+      return docs.map((doc) => Pikit.fromDocument(doc)).toList();
     });
   }
 
