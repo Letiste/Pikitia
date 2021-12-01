@@ -7,11 +7,12 @@ A Pikit is simply a photo, associated with the location when the photo was taken
 You can take Pikit but also see the Pikit around you, in a limited radius. That way, you can find the interesting events around you that are happening right now.
 
 A few screenshots to demonstrate what's currently implemented:
-
+<p>
 <img src="images/Register.png" height="200" style="margin-right:20px"/>
 <img src="images/Map.png" height="200" style="margin-right:20px"/>
 <img src="images/Camera.png" height="200" style="margin-right:20px"/>
 <img src="images/PikitScreen.png" height="200" style="margin-right:20px"/>
+</p>
 
 The app is currently on a closed beta test. If you are interested to join the beta, contact me.
 
