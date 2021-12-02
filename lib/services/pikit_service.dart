@@ -41,15 +41,29 @@ class PikitService {
       'isLandscape': pikitImage.isLandscape,
       'position': position.data,
       'userId': locator<UserService>().getCurrentUser()!.uid,
+      'imageId': pikitImage.imageId,
+      'imagePreviewId': pikitImage.imagePreviewId,
     });
   }
 
-  Future<List<Pikit>> getUserPikits() async {
+  Future<void> deletePikit(Pikit pikit) async {
+    var query = await _pikitsLikedCollection.where('pikitId', isEqualTo: pikit.pikitId).get();
+    var deleteLikedPikits = query.docs.map((doc) => doc.reference.delete());
+    await Future.wait([
+      _pikitsCollection.doc(pikit.pikitId).delete(),
+      ...deleteLikedPikits,
+      _storage.ref(pikit.pikitImage.imageId).delete(),
+      _storage.ref(pikit.pikitImage.imagePreviewId).delete(),
+    ]);
+  }
+
+  Stream<List<Pikit>> getUserPikits() {
     String currentUserId = locator<UserService>().getCurrentUser()!.uid;
-    var query = await _pikitsCollection.where('userId', isEqualTo: currentUserId).get();
-    return query.docs
-        .map((doc) => Pikit.fromDocument(doc as firebase_firestore.QueryDocumentSnapshot<Map<String, dynamic>>))
-        .toList();
+    return _pikitsCollection.where('userId', isEqualTo: currentUserId).snapshots().map((snapshot) {
+      return snapshot.docs
+          .map((doc) => Pikit.fromDocument(doc as firebase_firestore.QueryDocumentSnapshot<Map<String, dynamic>>))
+          .toList();
+    });
   }
 
   Future<List<Pikit>> getPikitsLikedByUser() async {
@@ -116,20 +130,26 @@ class PikitService {
       preview = img.copyResize(image, height: 120);
     }
     String fileName = const Uuid().v4();
+    late String imageId;
+    late String imagePreviewId;
     late String htmlUrl;
     late String htmlUrlPreview;
-    var uploadedImage = _storage
-        .ref('pikits/$fileName.jpeg')
-        .putFile(file)
-        .then((file) => _getHtmlUrl(file))
-        .then((url) => htmlUrl = url);
-    var uploadedImagePreview = _storage
-        .ref('pikits/$fileName-preview.jpeg')
-        .putData(img.encodeJpg(preview) as Uint8List)
-        .then((file) => _getHtmlUrl(file))
-        .then((url) => htmlUrlPreview = url);
+    var uploadedImage = _storage.ref('pikits/$fileName.jpeg').putFile(file).then((file) {
+      imageId = file.ref.fullPath.toString();
+      return _getHtmlUrl(file);
+    }).then((url) => htmlUrl = url);
+    var uploadedImagePreview =
+        _storage.ref('pikits/$fileName-preview.jpeg').putData(img.encodeJpg(preview) as Uint8List).then((file) {
+      imagePreviewId = file.ref.fullPath.toString();
+      return _getHtmlUrl(file);
+    }).then((url) => htmlUrlPreview = url);
     await Future.wait([uploadedImage, uploadedImagePreview]);
-    return PikitImage(htmlUrl: htmlUrl, htmlUrlPreview: htmlUrlPreview, isLandscape: isLandscape);
+    return PikitImage(
+        imageId: imageId,
+        imagePreviewId: imagePreviewId,
+        htmlUrl: htmlUrl,
+        htmlUrlPreview: htmlUrlPreview,
+        isLandscape: isLandscape);
   }
 
   Future<String> _getHtmlUrl(firebase_storage.TaskSnapshot snapshot) {
