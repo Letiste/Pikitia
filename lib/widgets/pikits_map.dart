@@ -5,6 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:pikitia/models/pikit.dart';
 import 'package:pikitia/services/pikit_service.dart';
 import 'package:pikitia/services/position_service.dart';
@@ -101,23 +102,24 @@ class _PhotosMapState extends State<PhotosMap> {
                         stream: pikitsStream,
                         builder: (context, snapshot) {
                           if (snapshot.data != null) {
-                            return MarkerLayerWidget(
-                              options: MarkerLayerOptions(
-                                markers: snapshot.data!.map((pikit) {
-                                  double height = pikit.pikitImage.isLandscape ? 36 : 64;
-                                  double width = pikit.pikitImage.isLandscape ? 64 : 36;
-                                  double offsetHeight = 8 + 2 + 2; // height of triangle + padding top + padding bottom
-                                  double offsetWidth = 2 + 2; // padding right + padding left
-                                  return Marker(
-                                      point: LatLng(pikit.position.latitude, pikit.position.longitude),
-                                      height: height + offsetHeight,
-                                      width: width + offsetWidth,
-                                      builder: (context) {
-                                        return PikitPreview(pikit: pikit, height: height, width: width);
-                                      });
-                                }).toList(),
+                            var pikitMarkers = snapshot.data!.map(buildPikitMarker).toList();
+                            return MarkerClusterLayerWidget(
+                                options: MarkerClusterLayerOptions(
+                              maxClusterRadius: 120,
+                              size: const Size(40, 40),
+                              fitBoundsOptions: const FitBoundsOptions(
+                                padding: EdgeInsets.all(50),
                               ),
-                            );
+                              markers: pikitMarkers,
+                              polygonOptions: const PolygonOptions(
+                                  borderColor: Colors.blueAccent, color: Colors.black12, borderStrokeWidth: 3),
+                              builder: (context, markers) {
+                                return FloatingActionButton(
+                                  child: Text(markers.length.toString()),
+                                  onPressed: null,
+                                );
+                              },
+                            ));
                           } else {
                             return Container();
                           }
@@ -150,5 +152,19 @@ class _PhotosMapState extends State<PhotosMap> {
         ),
       ],
     );
+  }
+
+  Marker buildPikitMarker(Pikit pikit) {
+    double height = pikit.pikitImage.isLandscape ? 36 : 64;
+    double width = pikit.pikitImage.isLandscape ? 64 : 36;
+    double offsetHeight = 8 + 2 + 2; // height of triangle + padding top + padding bottom
+    double offsetWidth = 2 + 2; // padding right + padding left
+    return Marker(
+        point: LatLng(pikit.position.latitude, pikit.position.longitude),
+        height: height + offsetHeight,
+        width: width + offsetWidth,
+        builder: (context) {
+          return PikitPreview(pikit: pikit, height: height, width: width);
+        });
   }
 }
