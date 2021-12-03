@@ -5,6 +5,7 @@ import 'package:pikitia/services/routes_service.dart';
 import 'package:pikitia/services/user_service.dart';
 import 'package:pikitia/stacks/logged_in_stack.dart';
 import 'package:pikitia/stacks/logged_out_stack.dart';
+import 'package:pikitia/stacks/pages_stack.dart';
 
 class PikitiaRouterDelegate extends RouterDelegate with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   PikitiaRouterDelegate() : _navigatorKey = GlobalKey<NavigatorState>() {
@@ -21,14 +22,6 @@ class PikitiaRouterDelegate extends RouterDelegate with ChangeNotifier, PopNavig
 
   @override
   GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
-
-  bool handlePopPage(Route route, result) {
-    if (!route.didPop(result)) return false;
-    if (_currentRoute == Routes.camera) _routesService.goToHome();
-    if (_currentRoute == Routes.userPikits) _routesService.goToHome();
-    if (_currentRoute == Routes.userLikedPikits) _routesService.goToHome();
-    return true;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,17 +41,18 @@ class PikitiaRouterDelegate extends RouterDelegate with ChangeNotifier, PopNavig
     );
   }
 
+// TODO: #46 replace with a routes builder with passing class construtor in function argument (coming in Dart 2.15)
   Widget loggedInRoutes() {
     return StreamBuilder<Routes>(
       stream: _routesStream,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           _currentRoute = snapshot.data!;
-          List<Page> stack = LoggedInStack(route: _currentRoute).stack;
+          PagesStack pagesStack = LoggedInStack(currentRoute: _currentRoute);
           return Navigator(
             key: navigatorKey,
-            pages: stack,
-            onPopPage: handlePopPage,
+            pages: pagesStack.stack,
+            onPopPage: (route, result) => pagesStack.handlePopPage(route, result, _routesService),
           );
         } else {
           return CircularProgressIndicator();
@@ -73,11 +67,11 @@ class PikitiaRouterDelegate extends RouterDelegate with ChangeNotifier, PopNavig
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           _currentRoute = snapshot.data!;
-          List<Page> stack = LoggedOutStack(route: _currentRoute).stack;
+          PagesStack pagesStack = LoggedOutStack(currentRoute: _currentRoute);
           return Navigator(
             key: navigatorKey,
-            pages: stack,
-            onPopPage: handlePopPage,
+            pages: pagesStack.stack,
+            onPopPage: (route, result) => pagesStack.handlePopPage(route, result, _routesService),
           );
         } else {
           return CircularProgressIndicator();
