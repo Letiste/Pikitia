@@ -4,18 +4,29 @@ import 'package:pikitia/pages/home_page.dart';
 import 'package:pikitia/pages/user_liked_pikits_page.dart';
 import 'package:pikitia/pages/user_pikits_page.dart';
 import 'package:pikitia/services/routes_service.dart';
+import 'package:pikitia/stacks/pages_stack.dart';
 
-class LoggedInStack {
-  LoggedInStack({required this.route});
+class LoggedInStack extends PagesStack {
+  LoggedInStack({required this.currentRoute});
 
-  final Routes route;
+  final Routes currentRoute;
 
+  @override
   List<Page> get stack {
     return [
       HomePage(),
-      if (route == Routes.camera) CameraPage(),
-      if (route == Routes.userPikits) UserPikitsPage(),
-      if (route == Routes.userLikedPikits) UserLikedPikitsPage(),
+      if (currentRoute == Routes.camera) CameraPage(),
+      if (currentRoute == Routes.userPikits) UserPikitsPage(),
+      if (currentRoute == Routes.userLikedPikits) UserLikedPikitsPage(),
     ];
+  }
+
+  @override
+  bool handlePopPage(Route route, result, RoutesService routesService) {
+    if (!route.didPop(result)) return false;
+    if (currentRoute == Routes.camera) routesService.goToHome();
+    if (currentRoute == Routes.userPikits) routesService.goToHome();
+    if (currentRoute == Routes.userLikedPikits) routesService.goToHome();
+    return true;
   }
 }
