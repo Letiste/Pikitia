@@ -47,12 +47,14 @@ class PikitService {
   }
 
   Future<void> deletePikit(Pikit pikit) async {
-    
+    var query = await _pikitsLikedCollection.where('pikitId', isEqualTo: pikit.pikitId).get();
+    var deleteLikedPikits = query.docs.map((doc) => doc.reference.delete());
     await Future.wait([
       _pikitsCollection.doc(pikit.pikitId).delete(),
+      ...deleteLikedPikits,
       _storage.ref(pikit.pikitImage.imageId).delete(),
       _storage.ref(pikit.pikitImage.imagePreviewId).delete(),
-      ]) ;
+    ]);
   }
 
   Stream<List<Pikit>> getUserPikits() {

@@ -41,9 +41,9 @@ class UserPikitsScreen extends StatelessWidget {
       children: [
         Center(child: Image.network(pikit.pikitImage.htmlUrl)),
         Align(
-          alignment: Alignment.bottomCenter,
+          alignment: Alignment.bottomRight,
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 20),
+            padding: const EdgeInsets.only(bottom: 30, right: 30),
             child: FloatingActionButton(
               backgroundColor: Colors.white,
               onPressed: () => showDialog(
@@ -59,7 +59,7 @@ class UserPikitsScreen extends StatelessWidget {
                             Navigator.of(dialogContext).pop();
                             Navigator.of(context).pop();
                           }),
-                          child: const Text('Delete Pikit')),
+                          child: const Text('Delete Pikit', style: TextStyle(color: Colors.red),)),
                     ],
                   );
                 },
