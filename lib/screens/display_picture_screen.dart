@@ -5,10 +5,23 @@ import 'package:pikitia/locator.dart';
 import 'package:pikitia/services/pikit_service.dart';
 import 'package:pikitia/services/routes_service.dart';
 
-class DisplayPictureScreen extends StatelessWidget {
+class DisplayPictureScreen extends StatefulWidget {
   const DisplayPictureScreen({Key? key, required this.imagePath}) : super(key: key);
 
   final String imagePath;
+
+  @override
+  State<DisplayPictureScreen> createState() => _DisplayPictureScreenState();
+}
+
+class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
+  bool _isPikitUploading = false;
+
+  void togglePikitUpload() {
+    setState(() {
+      _isPikitUploading = !_isPikitUploading;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,20 +45,26 @@ class DisplayPictureScreen extends StatelessWidget {
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
-                IconButton(
-                  color: Colors.white,
-                  iconSize: 36.0,
-                  icon: const Icon(Icons.check_circle_outline_rounded),
-                  onPressed: () =>
-                      locator<PikitService>().createPikit(imagePath).then((_) => locator<RoutesService>().goToHome())
-                ),
+                _isPikitUploading
+                    ? const CircularProgressIndicator()
+                    : IconButton(
+                        color: Colors.white,
+                        iconSize: 36.0,
+                        icon: const Icon(Icons.check_circle_outline_rounded),
+                        onPressed: () {
+                          togglePikitUpload();
+                          locator<PikitService>()
+                              .createPikit(widget.imagePath)
+                              .then((_) => locator<RoutesService>().goToHome());
+                        },
+                      ),
               ],
             ),
             const SizedBox(height: 20),
           ],
         ),
       ),
-      body: Center(child: Image.file(File(imagePath), fit: BoxFit.contain)),
+      body: Center(child: Image.file(File(widget.imagePath), fit: BoxFit.contain)),
     );
   }
 }
